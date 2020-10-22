@@ -6,15 +6,15 @@ import (
 	"unicode"
 )
 
-// FuncInfo is exported information about a golang func.
-type FuncInfo struct {
+// funcInfo is exported information about a golang func.
+type funcInfo struct {
 	Name    string
-	Params  []Param
+	Params  []param
 	Returns string
 }
 
-// Param is a function parameter.
-type Param struct {
+// param is a function parameter.
+type param struct {
 	Name string
 	Type string
 }
@@ -47,7 +47,7 @@ func isUpper(s string) bool {
 
 // appendParam appends a parameter to the list of method parameters ensuring it
 // has a unique name within the parameter set.
-func (finfo *FuncInfo) appendParam(p Param) {
+func (finfo *funcInfo) appendParam(p param) {
 	n := 0
 	for {
 		var name string

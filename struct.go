@@ -1,14 +1,14 @@
 package go2ts
 
-// StructInfo is exported information about a golang func.
-type StructInfo struct {
+// structInfo is exported information about a golang func.
+type structInfo struct {
 	Name   string
-	Fields []Field
+	Fields []field
 	// TODO: methods?
 }
 
-// Field is a struct field.
-type Field struct {
+// field is a struct field.
+type field struct {
 	Name string
 	Type string
 }

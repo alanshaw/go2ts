@@ -160,8 +160,8 @@ func (c *Converter) convert(t reflect.Type) string {
 }
 
 // extractFunc extracts type inforamtion about a function.
-func (c *Converter) extractFunc(t reflect.Type, isMethod bool) *FuncInfo {
-	finfo := FuncInfo{Name: t.Name(), Returns: "Promise<void>"}
+func (c *Converter) extractFunc(t reflect.Type, isMethod bool) *funcInfo {
+	finfo := funcInfo{Name: t.Name(), Returns: "Promise<void>"}
 	if t.NumOut() > 0 {
 		var rets []string
 		for i := 0; i < t.NumOut(); i++ {
@@ -194,7 +194,7 @@ func (c *Converter) extractFunc(t reflect.Type, isMethod bool) *FuncInfo {
 		if in.Name() == "Context" {
 			continue
 		}
-		p := Param{c.paramName(in), c.convert(in)}
+		p := param{c.paramName(in), c.convert(in)}
 		finfo.appendParam(p)
 	}
 
@@ -244,14 +244,14 @@ func (c *Converter) convertFunc(t reflect.Type) string {
 }
 
 // extractStruct extracts typescript type information about a struct.
-func (c *Converter) extractStruct(t reflect.Type) *StructInfo {
-	sinfo := StructInfo{Name: t.Name()}
+func (c *Converter) extractStruct(t reflect.Type) *structInfo {
+	sinfo := structInfo{Name: t.Name()}
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 		if !isUpper(f.Name[0:1]) {
 			continue
 		}
-		sinfo.Fields = append(sinfo.Fields, Field{Name: f.Name, Type: c.convert(f.Type)})
+		sinfo.Fields = append(sinfo.Fields, field{Name: f.Name, Type: c.convert(f.Type)})
 	}
 	return &sinfo
 }
