@@ -15,7 +15,7 @@ Note:
 * If a function returns multiple values they are returned as an array.
 * Context in function params is ignored.
 * Recursion is NOT supported.
-* Interfaces are converted to any.
+* Interfaces are converted to `any`.
 * `struct` methods are NOT converted, but `Converter.ConvertMethod` can be used to create method declarations.
 
 ## Install
