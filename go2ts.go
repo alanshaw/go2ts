@@ -56,6 +56,21 @@ var primitives = map[reflect.Type]string{
 
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
 
+// FuncConfig are configuration options that determine how a function is
+// converted into a typescript declaration by the converter.
+type FuncConfig struct {
+	// IsSync flags that the func is synchronous and returns values instead of a
+	// Promise that resolves to the return values.
+	IsSync bool
+	// AlwaysArray will cause an array to be returned, even if there is only a
+	// single return value. By default an array is only returned if there are 2+
+	// return values.
+	AlwaysArray bool
+	// NoIgnoreContext will include a context.Context param in the typescript
+	// function declaration if it is the first parameter. Default is to ignore it.
+	NoIgnoreContext bool
+}
+
 // Converter will convert a golang reflect.Type to Typescript type string.
 type Converter struct {
 	types      map[reflect.Type]string
@@ -64,9 +79,12 @@ type Converter struct {
 	// table. It is safe (and expected) that Converter.AddTypes is called from
 	// this handler so that discovered types can be included in a converted type.
 	OnConvert func(reflect.Type, string)
+	// ConfigureFunc is called for each function that is converted in order to set
+	// configuration options for how the typescript declaration should appear.
+	ConfigureFunc func(reflect.Type) FuncConfig
 }
 
-// NewConverter creates a new converter instance with primative types added.
+// NewConverter creates a new converter instance with primitive types added.
 func NewConverter() *Converter {
 	c := Converter{
 		types:      make(map[reflect.Type]string),
