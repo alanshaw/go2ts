@@ -11,12 +11,13 @@ Convert golang types to Typescript declarations.
 
 Note:
 * `chan T` is converted to `AsyncIterable<T>`.
-* Assumes functions/methods are async so return values are all `Promise<T>` and errors assumed to be thrown not returned.
-* If a function returns multiple values they are returned as an array.
-* `context.Context` in function parameters is ignored.
-* Recursion is NOT supported.
 * Interfaces are converted to `any`.
 * `struct` methods are NOT converted, but `Converter.ConfigureFunc` can be used to create method declarations.
+* Recursion is NOT supported.
+* By default:
+    * Assumes functions/methods are async so return values are all `Promise<T>` and errors assumed to be thrown not returned.
+    * `context.Context` in function parameters is ignored.
+    * If a function returns multiple values they are returned as an array.
 
 ## Install
 
