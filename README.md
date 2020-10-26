@@ -62,7 +62,10 @@ func main () {
       IsSync: true, // do not wrap return values in Promise<T>
       AlwaysArray: true, // always return an array of return values even if there's only 1
       NoIgnoreContext: true, // don't ignore the context.Context param
-      ParamNames: []string{"ctx"} // ordered parameter names
+      ParamNames: []string{"ctx"}, // ordered parameter names
+      // Also...
+      // IsMethod: true,
+      // MethodName: "MyMethod"
     }
   }
   c.Convert(reflect.TypeOf(func(context.Context) User { return nil })
