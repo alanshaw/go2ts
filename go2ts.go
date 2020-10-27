@@ -56,6 +56,28 @@ var primitives = map[reflect.Type]string{
 
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
 
+// FuncConf are configuration options that determine how a function is
+// converted into a typescript declaration by the converter.
+type FuncConf struct {
+	// IsSync flags that the func is synchronous and returns values instead of a
+	// Promise that resolves to the return values.
+	IsSync bool
+	// AlwaysArray will cause an array to be returned, even if there is only a
+	// single return value. By default an array is only returned if there are 2+
+	// return values.
+	AlwaysArray bool
+	// NoIgnoreContext will include a context.Context param in the typescript
+	// function declaration if it is the first parameter. Default is to ignore it.
+	NoIgnoreContext bool
+	// IsMethod flags that the func is a method with a (ignored) receiver param
+	// and causes the converter to output a class method declaration.
+	IsMethod bool
+	// MethodName is the name of the method, used when FuncConf.IsMethod is true.
+	MethodName string
+	// ParamNames overrides default or global parameter names.
+	ParamNames []string
+}
+
 // Converter will convert a golang reflect.Type to Typescript type string.
 type Converter struct {
 	types      map[reflect.Type]string
@@ -64,9 +86,12 @@ type Converter struct {
 	// table. It is safe (and expected) that Converter.AddTypes is called from
 	// this handler so that discovered types can be included in a converted type.
 	OnConvert func(reflect.Type, string)
+	// ConfigureFunc is called for each function that is converted in order to set
+	// configuration options for how the typescript declaration should appear.
+	ConfigureFunc func(reflect.Type) FuncConf
 }
 
-// NewConverter creates a new converter instance with primative types added.
+// NewConverter creates a new converter instance with primitive types added.
 func NewConverter() *Converter {
 	c := Converter{
 		types:      make(map[reflect.Type]string),
@@ -160,8 +185,8 @@ func (c *Converter) convert(t reflect.Type) string {
 }
 
 // extractFunc extracts type inforamtion about a function.
-func (c *Converter) extractFunc(t reflect.Type, isMethod bool) *funcInfo {
-	finfo := funcInfo{Name: t.Name(), Returns: "Promise<void>"}
+func (c *Converter) extractFunc(t reflect.Type, fconf FuncConf) *funcInfo {
+	finfo := funcInfo{Name: t.Name(), Returns: "void"}
 	if t.NumOut() > 0 {
 		var rets []string
 		for i := 0; i < t.NumOut(); i++ {
@@ -173,31 +198,36 @@ func (c *Converter) extractFunc(t reflect.Type, isMethod bool) *funcInfo {
 		}
 
 		// If only 1 value just return it, if more than 1 we need to wrap in array.
-		if len(rets) == 1 {
-			if t.Out(0).Kind() == reflect.Chan {
-				finfo.Returns = rets[0]
-			} else {
-				finfo.Returns = fmt.Sprintf("Promise<%s>", rets[0])
-			}
-		} else if len(rets) > 1 {
-			finfo.Returns = fmt.Sprintf("Promise<[%s]>", strings.Join(rets, ", "))
+		if (len(rets) > 0 && fconf.AlwaysArray) || len(rets) > 1 {
+			finfo.Returns = fmt.Sprintf("[%s]", strings.Join(rets, ", "))
+		} else if len(rets) == 1 {
+			finfo.Returns = rets[0]
 		}
 	}
 
 	start := 0
-	if isMethod {
+	if fconf.IsMethod {
 		start = 1 // first argument is receiver, so skip over this
 	}
 	for i := start; i < t.NumIn(); i++ {
 		in := t.In(i)
 		// skip context if method takes one
-		if in.Name() == "Context" {
+		if in.Name() == "Context" && !fconf.NoIgnoreContext {
 			continue
 		}
-		p := param{c.paramName(in), c.convert(in)}
+		var name string
+		if len(fconf.ParamNames) > i {
+			name = fconf.ParamNames[i]
+		} else {
+			name = c.paramName(in)
+		}
+		p := param{name, c.convert(in)}
 		finfo.appendParam(p)
 	}
 
+	if !fconf.IsSync {
+		finfo.Returns = fmt.Sprintf("Promise<%s>", finfo.Returns)
+	}
 	return &finfo
 }
 
@@ -223,22 +253,19 @@ func (c *Converter) paramName(t reflect.Type) string {
 	return name
 }
 
-// ConvertMethod converts a method type to a typescript declaration.
-func (c *Converter) ConvertMethod(m reflect.Method) string {
-	finfo := c.extractFunc(m.Type, true)
+// ConvertFunc converts a function type to a typescript declaration.
+func (c *Converter) convertFunc(t reflect.Type) string {
+	var fconf FuncConf
+	if c.ConfigureFunc != nil {
+		fconf = c.ConfigureFunc(t)
+	}
+	finfo := c.extractFunc(t, fconf)
 	var params []string
 	for _, p := range finfo.Params {
 		params = append(params, fmt.Sprintf("%s: %s", p.Name, p.Type))
 	}
-	return fmt.Sprintf("%s (%s): %s", m.Name, strings.Join(params, ", "), finfo.Returns)
-}
-
-// ConvertFunc converts a function type to a typescript declaration.
-func (c *Converter) convertFunc(t reflect.Type) string {
-	finfo := c.extractFunc(t, false)
-	var params []string
-	for _, p := range finfo.Params {
-		params = append(params, fmt.Sprintf("%s: %s", p.Name, p.Type))
+	if fconf.IsMethod {
+		return fmt.Sprintf("%s (%s): %s", fconf.MethodName, strings.Join(params, ", "), finfo.Returns)
 	}
 	return fmt.Sprintf("(%s) => %s", strings.Join(params, ", "), finfo.Returns)
 }

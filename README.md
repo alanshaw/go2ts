@@ -11,12 +11,13 @@ Convert golang types to Typescript declarations.
 
 Note:
 * `chan T` is converted to `AsyncIterable<T>`.
-* Assumes functions/methods are async so return values are all `Promise<T>` and errors assumed to be thrown not returned.
-* If a function returns multiple values they are returned as an array.
-* `context.Context` in function parameters is ignored.
-* Recursion is NOT supported.
 * Interfaces are converted to `any`.
-* `struct` methods are NOT converted, but `Converter.ConvertMethod` can be used to create method declarations.
+* `struct` methods are NOT converted, but `Converter.ConfigureFunc` can be used to create method declarations.
+* Recursion is NOT supported.
+* By default:
+    * Assumes functions/methods are async so return values are all `Promise<T>` and errors assumed to be thrown not returned.
+    * `context.Context` in function parameters is ignored.
+    * If a function returns multiple values they are returned as an array.
 
 ## Install
 
@@ -55,6 +56,21 @@ func main () {
 
   // Output now includes "User" instead of { Name: string }
   c.Convert(reflect.TypeOf(map[string]User{})) // { [k: string]: User }
+
+  // Configuration for the function declarations:
+  c.ConfigureFunc = func(t reflect.Type) FuncConf {
+    return FuncConf{
+      IsSync: true, // do not wrap return values in Promise<T>
+      AlwaysArray: true, // always return an array of return values even if there's only 1
+      NoIgnoreContext: true, // don't ignore the context.Context param
+      ParamNames: []string{"ctx"}, // ordered parameter names
+      // Also...
+      // IsMethod: true,
+      // MethodName: "MyMethod"
+    }
+  }
+  c.Convert(reflect.TypeOf(func(context.Context) User { return nil })
+  // (ctx: any) => [User]
 }
 ```
 
