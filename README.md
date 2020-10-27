@@ -1,7 +1,7 @@
 # go2ts
 
 [![Build Status](https://travis-ci.org/alanshaw/go2ts.svg?branch=main)](https://travis-ci.org/alanshaw/go2ts)
-[![Coverage](https://codecov.io/gh/alanshaw/go2ts/branch/master/graph/badge.svg)](https://codecov.io/gh/alanshaw/go2ts)
+[![Coverage](https://codecov.io/gh/alanshaw/go2ts/branch/main/graph/badge.svg)](https://codecov.io/gh/alanshaw/go2ts)
 [![Standard README](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 [![pkg.go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/alanshaw/go2ts)
 [![golang version](https://img.shields.io/badge/golang-%3E%3D1.15.0-orange.svg)](https://golang.org/)
