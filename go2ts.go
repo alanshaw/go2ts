@@ -37,21 +37,21 @@ import (
 )
 
 var primitives = map[reflect.Type]string{
-	reflect.TypeOf(false):      "boolean",
-	reflect.TypeOf(0):          "number",
-	reflect.TypeOf(int8(0)):    "number",
-	reflect.TypeOf(int16(0)):   "number",
-	reflect.TypeOf(int32(0)):   "number",
-	reflect.TypeOf(int64(0)):   "number",
-	reflect.TypeOf(uint(0)):    "number",
-	reflect.TypeOf(uint8(0)):   "number",
-	reflect.TypeOf(uint16(0)):  "number",
-	reflect.TypeOf(uint32(0)):  "number",
-	reflect.TypeOf(uint64(0)):  "number",
-	reflect.TypeOf(float32(0)): "number",
-	reflect.TypeOf(float64(0)): "number",
-	reflect.TypeOf(uintptr(0)): "number",
-	reflect.TypeOf(""):         "string",
+	reflect.TypeOf((*bool)(nil)).Elem():    "boolean",
+	reflect.TypeOf((*int)(nil)).Elem():     "number",
+	reflect.TypeOf((*int8)(nil)).Elem():    "number",
+	reflect.TypeOf((*int16)(nil)).Elem():   "number",
+	reflect.TypeOf((*int32)(nil)).Elem():   "number",
+	reflect.TypeOf((*int64)(nil)).Elem():   "number",
+	reflect.TypeOf((*uint)(nil)).Elem():    "number",
+	reflect.TypeOf((*uint8)(nil)).Elem():   "number",
+	reflect.TypeOf((*uint16)(nil)).Elem():  "number",
+	reflect.TypeOf((*uint32)(nil)).Elem():  "number",
+	reflect.TypeOf((*uint64)(nil)).Elem():  "number",
+	reflect.TypeOf((*float32)(nil)).Elem(): "number",
+	reflect.TypeOf((*float64)(nil)).Elem(): "number",
+	reflect.TypeOf((*uintptr)(nil)).Elem(): "number",
+	reflect.TypeOf((*string)(nil)).Elem():  "string",
 }
 
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
