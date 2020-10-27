@@ -4,29 +4,29 @@
 // 	package main
 //
 // 	import (
-//   	"reflect"
-//   	"github.com/alanshaw/go2ts"
+// 		"reflect"
+// 		"github.com/alanshaw/go2ts"
 // 	)
 //
 // 	type User struct {
-//   	Name string
+// 		Name string
 // 	}
 //
 // 	func main () {
-//   	c := go2ts.NewConverter()
+// 		c := go2ts.NewConverter()
 //
-//   	c.Convert(reflect.TypeOf("")) // string
-//   	c.Convert(reflect.TypeOf(User{})) // { Name: string }
-//   	c.Convert(reflect.TypeOf(func(string, int, bool) User { return nil })
-//   	// (str: string, int: number, bool: boolean) => Promise<{ Name: string }>
+// 		c.Convert(reflect.TypeOf("")) // string
+// 		c.Convert(reflect.TypeOf(User{})) // { Name: string }
+// 		c.Convert(reflect.TypeOf(func(string, int, bool) User { return nil })
+// 		// (str: string, int: number, bool: boolean) => Promise<{ Name: string }>
 //
-//   	// Add custom type declarations
-//   	c.AddTypes(map[reflect.Type]string{
-//     	reflect.TypeOf(User{}): "User"
-//   	})
+// 		// Add custom type declarations
+// 		c.AddTypes(map[reflect.Type]string{
+// 			reflect.TypeOf(User{}): "User"
+// 		})
 //
-//   	// Output now includes "User" instead of { Name: string }
-//   	c.Convert(reflect.TypeOf(map[string]User{})) // { [k: string]: User }
+// 		// Output now includes "User" instead of { Name: string }
+// 		c.Convert(reflect.TypeOf(map[string]User{})) // { [k: string]: User }
 // 	}
 package go2ts
 
@@ -134,8 +134,8 @@ func (c *Converter) AddParamNames(customParamNames map[reflect.Type]string) {
 //
 // Interfaces are converted to any.
 //
-// struct methods are NOT converted, but Converter.ConvertMethod can be used to
-// create method declarations.
+// struct methods are NOT converted, but Converter.ConfigureFunc can be 
+// used to create method declarations.
 func (c *Converter) Convert(t reflect.Type) (ts string) {
 	ts, ok := c.types[t]
 	if ok {
