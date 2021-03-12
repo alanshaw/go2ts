@@ -134,7 +134,7 @@ func (c *Converter) AddParamNames(customParamNames map[reflect.Type]string) {
 //
 // Interfaces are converted to any.
 //
-// struct methods are NOT converted, but Converter.ConfigureFunc can be 
+// struct methods are NOT converted, but Converter.ConfigureFunc can be
 // used to create method declarations.
 func (c *Converter) Convert(t reflect.Type) (ts string) {
 	ts, ok := c.types[t]
@@ -162,7 +162,7 @@ func (c *Converter) Convert(t reflect.Type) (ts string) {
 		ts = c.convertFunc(t)
 	} else if kind == reflect.Struct {
 		ts = c.convertStruct(t)
-	} else if kind == reflect.Slice {
+	} else if kind == reflect.Slice || kind == reflect.Array {
 		ts = fmt.Sprintf("Array<%s>", c.convert(t.Elem()))
 	} else if kind == reflect.Map {
 		ts = fmt.Sprintf("{ [k: string]: %s }", c.convert(t.Elem()))
