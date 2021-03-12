@@ -79,6 +79,11 @@ func TestSlices(t *testing.T) {
 	expect(t, c.Convert(typ([]*User{})), "Array<{ Name: string }>")
 }
 
+func TestArrays(t *testing.T) {
+	c := NewConverter()
+	expect(t, c.Convert(typ([2]string{"first", "second"})), "Array<string>")
+}
+
 func TestMaps(t *testing.T) {
 	c := NewConverter()
 	expect(t, c.Convert(typ(map[string]int{})), "{ [k: string]: number }")
